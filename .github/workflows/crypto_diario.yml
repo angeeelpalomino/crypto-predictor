@@ -1,0 +1,50 @@
+name: Análisis Diario de Criptomonedas
+
+on:
+  # Corre todos los días a las 8:00 AM hora Ciudad de México (14:00 UTC)
+  schedule:
+    - cron: "0 14 * * *"
+
+  # También puedes correrlo manualmente desde GitHub
+  workflow_dispatch:
+
+jobs:
+  analizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    # Permiso para que el bot pueda subir el reporte al repo
+    permissions:
+      contents: write
+
+    steps:
+      # 1. Descargar tu repositorio
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      # 2. Instalar Python
+      - name: Configurar Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # 3. Instalar dependencias
+      - name: Instalar dependencias
+        run: |
+          pip install --upgrade pip
+          pip install yfinance tensorflow scikit-learn \
+                      pandas numpy matplotlib seaborn
+
+      # 4. Correr el análisis
+      - name: Ejecutar análisis de criptomonedas
+        run: python analizar_cryptos.py
+
+      # 5. Subir el reporte HTML al repositorio
+      - name: Publicar reporte
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add reporte/
+          git diff --staged --quiet || git commit -m "Reporte automático $(date +'%Y-%m-%d')"
+          git push
