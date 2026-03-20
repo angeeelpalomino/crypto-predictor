@@ -36,7 +36,7 @@ jobs:
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_PASSWORD: ${{ secrets.GMAIL_PASSWORD }}
-          DESTINATARIO: "000042@edgehub.edu.mx"
+          DESTINATARIO: ${{ secrets.GMAIL_USER }}
 
       - name: Publicar reporte
         run: |
